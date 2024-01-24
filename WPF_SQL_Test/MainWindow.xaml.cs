@@ -12,7 +12,7 @@ namespace WPF_SQL_Test
         public List<Department> departments { get; set; }
         public List<Employee> employees { get; set; }
 
-        private Employee oldEmployee;
+        private bool employeeHasChanged = false;
 
         public MainWindow()
         {
@@ -87,7 +87,6 @@ namespace WPF_SQL_Test
             if (result == MessageBoxResult.Cancel)
             {
                 e.Handled = true;
-                return;
             }
             else if (result == MessageBoxResult.OK)
             {
@@ -105,31 +104,38 @@ namespace WPF_SQL_Test
             grid.Items.Refresh();
         }
 
-        private void grid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
-        {
-            oldEmployee = e.Row.Item as Employee;
-        }
-
         private void grid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {
-            Employee employeeToEdit = e.Row.Item as Employee;
-            if (e.EditAction == DataGridEditAction.Commit && employeeToEdit != oldEmployee)
+            if (e.EditAction == DataGridEditAction.Commit && employeeHasChanged)
             {
                 MessageBoxResult result = MessageBox.Show("Вы действительно хотите изменить данные сотрудника?", "Внимание", MessageBoxButton.OKCancel);
                 if (result == MessageBoxResult.Cancel)
                 {
                     e.Cancel = true;
-                    int empIndex = employees.IndexOf(employeeToEdit);
-                    employees[empIndex] = oldEmployee;
-                    grid.ItemsSource = employees;
-                    return;
+                    employeeHasChanged = false;
                 }
                 else if (result == MessageBoxResult.OK)
                 {
+                    Employee employeeToEdit = e.Row.Item as Employee;
                     data.UpdateEmployee(employeeToEdit);
-                    UpdateGrid();
                 }
+                UpdateGrid();
             }
+        }
+
+        private void LastNameBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            employeeHasChanged = true;
+        }
+
+        private void FirstNameBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            employeeHasChanged = true;
+        }
+
+        private void DepartmentComboBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            employeeHasChanged = true;
         }
     }
 }
