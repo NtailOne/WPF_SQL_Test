@@ -56,7 +56,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="EmployeeCreateWindow.xaml">
+    <Page Include="DepartmentWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EmployeeWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -70,9 +74,12 @@
     </Compile>
     <Compile Include="Data.cs" />
     <Compile Include="Department.cs" />
+    <Compile Include="DepartmentWindow.xaml.cs">
+      <DependentUpon>DepartmentWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Employee.cs" />
-    <Compile Include="EmployeeCreateWindow.xaml.cs">
-      <DependentUpon>EmployeeCreateWindow.xaml</DependentUpon>
+    <Compile Include="EmployeeWindow.xaml.cs">
+      <DependentUpon>EmployeeWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

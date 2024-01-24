@@ -5,30 +5,37 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPF_SQL_Test"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800">
+        Title="MainWindow" Height="600" Width="800" MinWidth="800" MinHeight="600">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-
-        <DataGrid Name="grid" Grid.Row="1" ItemsSource="{Binding employees}" Margin="0,0,0,38" CanUserAddRows="False" AutoGenerateColumns="False" >
+        <DataGrid Name="grid" ItemsSource="{Binding employees}" Margin="0,0,0,38" CanUserAddRows="False" AutoGenerateColumns="False" RowEditEnding="grid_RowEditEnding" BeginningEdit="grid_BeginningEdit" >
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Фамилия">
+                <DataGridTemplateColumn Header="Фамилия" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding lastName}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding lastName, UpdateSourceTrigger=LostFocus}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Имя">
+
+                <DataGridTemplateColumn Header="Имя" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding firstName}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding firstName, UpdateSourceTrigger=LostFocus}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Подразделение">
+
+                <DataGridTemplateColumn Header="Подразделение" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding department.depName}" />
@@ -36,13 +43,29 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <ComboBox ItemsSource="{Binding departments, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding department}" DisplayMemberPath="depName" />
+                            <ComboBox Name="comboBox" ItemsSource="{Binding departments, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding department}" DisplayMemberPath="depName" >
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding depName}" />
+                                            <Expander Margin="5,0,0,0" >
+                                                <StackPanel Orientation="Vertical">
+                                                    <Button Content="Изменить" Margin="0,5,0,5" Click="EditDepartmentButton_Click" />
+                                                    <Button Content="Удалить"  Margin="0,0,0,5" Click="DeleteDepartmentButton_Click" />
+                                                </StackPanel>
+                                            </Expander>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-
-        <Button Content="Добавить сотрудника" Click="CreateButton_Click" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,0" Width="800" Height="38" />
+        <UniformGrid Rows="1" VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
+            <Button Content="Добавить сотрудника" Click="AddEmployeeButton_Click" Height="40" />
+            <Button Content="Добавить подразделение" Click="AddDepartmentButton_Click" Height="40" />
+        </UniformGrid>
     </Grid>
 </Window>
