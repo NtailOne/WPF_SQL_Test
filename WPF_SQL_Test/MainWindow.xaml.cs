@@ -111,13 +111,17 @@ namespace WPF_SQL_Test
             }
             else if (result == MessageBoxResult.OK)
             {
-                SqlParameter[] parameters =
+                SqlParameter[] updateEmployeesParameters =
                 {
-                    new SqlParameter("@DepartmentName", departmentToDelete.depName),
+                    new SqlParameter("@DBNull", DBNull.Value),
                     new SqlParameter("@DepartmentId", departmentToDelete.idDep)
                 };
-                data.ExecutableQuery("UPDATE employees SET department_id = {DBNull.Value} WHERE department_id = @DepartmentId", parameters);
-                data.ExecutableQuery("DELETE FROM departments WHERE id_dep = @DepartmentId", parameters);
+                SqlParameter[] deleteDepartmentParameters =
+                {
+                    new SqlParameter("@DepartmentId", departmentToDelete.idDep)
+                };
+                data.ExecutableQuery("UPDATE employees SET department_id = @DBNull WHERE department_id = @DepartmentId", updateEmployeesParameters);
+                data.ExecutableQuery("DELETE FROM departments WHERE id_dep = @DepartmentId", deleteDepartmentParameters);
                 UpdateGrid();
             }
         }
@@ -130,12 +134,12 @@ namespace WPF_SQL_Test
             grid.Items.Refresh();
         }
 
-        private void grid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        private void DataGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             oldEmployee = new Employee(grid.SelectedItem as Employee);
         }
 
-        private void grid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
+        private void DataGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {
             Employee employeeToEdit = e.Row.Item as Employee;
             if (e.EditAction == DataGridEditAction.Commit && oldEmployee != employeeToEdit)
