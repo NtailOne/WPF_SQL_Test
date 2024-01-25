@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -39,7 +40,11 @@ namespace WPF_SQL_Test
                 }
                 else if (result == MessageBoxResult.OK)
                 {
-                    data.ExecutableQuery($"DELETE FROM employees WHERE id_emp = {employeeToDelete.idEmp}");
+                    SqlParameter[] parameters =
+                    {
+                        new SqlParameter("@EmployeeId", employeeToDelete.idEmp)
+                    };
+                    data.ExecutableQuery("DELETE FROM employees WHERE id_emp = @EmployeeId", parameters);
                     UpdateGrid();
                 }
             }
@@ -51,7 +56,13 @@ namespace WPF_SQL_Test
             employeeCreateWindow.ShowDialog();
             if (employeeCreateWindow.DialogResult == true)
             {
-                data.ExecutableQuery($"INSERT INTO employees (last_name, first_name, department_id) VALUES ({employeeCreateWindow.newEmployee.lastName}, {employeeCreateWindow.newEmployee.firstName}, {employeeCreateWindow.newEmployee.department.idDep})");
+                SqlParameter[] parameters =
+                {
+                    new SqlParameter("@LastName", employeeCreateWindow.newEmployee.lastName),
+                    new SqlParameter("@FirstName", employeeCreateWindow.newEmployee.firstName),
+                    new SqlParameter("@DepartmentId", employeeCreateWindow.newEmployee.department.idDep)
+                };
+                data.ExecutableQuery("INSERT INTO employees (last_name, first_name, department_id) VALUES (@LastName, @FirstName, @DepartmentId)", parameters);
                 UpdateGrid();
             }
         }
@@ -62,7 +73,11 @@ namespace WPF_SQL_Test
             departmentWindow.ShowDialog();
             if (departmentWindow.DialogResult == true)
             {
-                data.ExecutableQuery($"INSERT INTO departments(dep_name) VALUES({departmentWindow.newDepartment.depName})");
+                SqlParameter[] parameters =
+                {
+                    new SqlParameter("@DepartmentName", departmentWindow.newDepartment.depName)
+                };
+                data.ExecutableQuery("INSERT INTO departments(dep_name) VALUES(@DepartmentName)", parameters);
                 departments = data.GetDepartments();
             }
         }
@@ -75,7 +90,12 @@ namespace WPF_SQL_Test
             departmentWindow.ShowDialog();
             if (departmentWindow.DialogResult == true)
             {
-                data.ExecutableQuery($"UPDATE departments SET dep_name = {departmentWindow.newDepartment.depName} WHERE id_dep = {departmentWindow.newDepartment.idDep}");
+                SqlParameter[] parameters =
+                {
+                    new SqlParameter("@DepartmentName", departmentWindow.newDepartment.depName),
+                    new SqlParameter("@DepartmentId", departmentWindow.newDepartment.idDep)
+                };
+                data.ExecutableQuery("UPDATE departments SET dep_name = @DepartmentName WHERE id_dep = @DepartmentId", parameters);
                 UpdateGrid();
             }
         }
@@ -91,8 +111,13 @@ namespace WPF_SQL_Test
             }
             else if (result == MessageBoxResult.OK)
             {
-                data.ExecutableQuery($"UPDATE employees SET department_id = {DBNull.Value} WHERE department_id = {departmentToDelete.idDep}");
-                data.ExecutableQuery($"DELETE FROM departments WHERE id_dep = {departmentToDelete.idDep}");
+                SqlParameter[] parameters =
+                {
+                    new SqlParameter("@DepartmentName", departmentToDelete.depName),
+                    new SqlParameter("@DepartmentId", departmentToDelete.idDep)
+                };
+                data.ExecutableQuery("UPDATE employees SET department_id = {DBNull.Value} WHERE department_id = @DepartmentId", parameters);
+                data.ExecutableQuery("DELETE FROM departments WHERE id_dep = @DepartmentId", parameters);
                 UpdateGrid();
             }
         }
@@ -119,11 +144,18 @@ namespace WPF_SQL_Test
                 if (result == MessageBoxResult.Cancel)
                 {
                     e.Cancel = true;
-                    employeeToEdit = oldEmployee; /*тут не работает*/
+                    UpdateGrid();
                 }
                 else if (result == MessageBoxResult.OK)
                 {
-                    data.ExecutableQuery($"UPDATE employees SET last_name = {employeeToEdit.lastName}, first_name = {employeeToEdit.firstName}, department_id = {employeeToEdit.department.idDep} WHERE id_emp = {employeeToEdit.idEmp}");
+                    SqlParameter[] parameters =
+                    {
+                        new SqlParameter("@EmployeeId", employeeToEdit.idEmp),
+                        new SqlParameter("@LastName", employeeToEdit.lastName),
+                        new SqlParameter("@FirstName", employeeToEdit.firstName),
+                        new SqlParameter("@DepartmentId", employeeToEdit.department.idDep)
+                    };
+                    data.ExecutableQuery("UPDATE employees SET last_name = @LastName, first_name = @FirstName, department_id = @DepartmentId WHERE id_emp = @EmployeeId", parameters);
                     UpdateGrid();
                 }
             }

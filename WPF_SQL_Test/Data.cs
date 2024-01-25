@@ -31,13 +31,14 @@ namespace WPF_SQL_Test
             return null;
         }
 
-        public void ExecutableQuery(string query)
+        public void ExecutableQuery(string query, SqlParameter[] parameters)
         {
             try
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddRange(parameters);
                     connection.Open();
                     command.ExecuteNonQuery();
                 }
@@ -92,47 +93,30 @@ namespace WPF_SQL_Test
 
         public List<Employee> GetEmployees()
         {
+            DataTable dataTable = GetQuery("SELECT * FROM employees");
             List<Employee> employees = new List<Employee>();
 
-            try
+            foreach (DataRow row in dataTable.Rows)
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                int employeeId = Convert.ToInt32(row["id_emp"]);
+                string lastName = row["last_name"].ToString();
+                string firstName = row["first_name"].ToString();
+                int departmentId;
+                object departmentIdObj = row["department_id"];
+                if (departmentIdObj != DBNull.Value) departmentId = Convert.ToInt32(row["department_id"]);
+                else departmentId = -1;
+
+                Department department = GetDepartmentById(departmentId);
+
+                Employee employee = new Employee()
                 {
-                    string query = "SELECT * FROM employees";
-                    SqlCommand command = new SqlCommand(query, connection);
+                    idEmp = employeeId,
+                    lastName = lastName,
+                    firstName = firstName,
+                    department = department
+                };
 
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        int employeeId = Convert.ToInt32(reader["id_emp"]);
-                        string lastName = reader["last_name"].ToString();
-                        string firstName = reader["first_name"].ToString();
-                        int departmentId;
-                        object departmentIdObj = reader["department_id"];
-                        if (departmentIdObj != DBNull.Value) departmentId = Convert.ToInt32(reader["department_id"]);
-                        else departmentId = -1;
-
-                        Department department = GetDepartmentById(departmentId);
-
-                        Employee employee = new Employee()
-                        {
-                            idEmp = employeeId,
-                            lastName = lastName,
-                            firstName = firstName,
-                            department = department
-                        };
-
-                        employees.Add(employee);
-                    }
-
-                    reader.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
+                employees.Add(employee);
             }
 
             return employees;

@@ -10,6 +10,7 @@
         public Employee() { }
         public Employee(Employee other)
         {
+            idEmp = other.idEmp;
             lastName = other.lastName;
             firstName = other.firstName;
             department = other.department;
