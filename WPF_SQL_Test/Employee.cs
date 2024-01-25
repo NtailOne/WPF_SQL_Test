@@ -6,5 +6,13 @@
         public string lastName { get; set; }
         public string firstName { get; set; }
         public Department department { get; set; }
+
+        public Employee() { }
+        public Employee(Employee other)
+        {
+            lastName = other.lastName;
+            firstName = other.firstName;
+            department = other.department;
+        }
     }
 }

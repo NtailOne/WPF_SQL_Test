@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -12,7 +13,6 @@ namespace WPF_SQL_Test
         public List<Department> departments { get; set; }
         public List<Employee> employees { get; set; }
 
-        private bool employeeHasChanged = false;
         private Employee oldEmployee;
 
         public MainWindow()
@@ -39,7 +39,7 @@ namespace WPF_SQL_Test
                 }
                 else if (result == MessageBoxResult.OK)
                 {
-                    data.DeleteEmployeeById(employeeToDelete.idEmp);
+                    data.ExecutableQuery($"DELETE FROM employees WHERE id_emp = {employeeToDelete.idEmp}");
                     UpdateGrid();
                 }
             }
@@ -51,7 +51,7 @@ namespace WPF_SQL_Test
             employeeCreateWindow.ShowDialog();
             if (employeeCreateWindow.DialogResult == true)
             {
-                data.AddEmployee(employeeCreateWindow.newEmployee);
+                data.ExecutableQuery($"INSERT INTO employees (last_name, first_name, department_id) VALUES ({employeeCreateWindow.newEmployee.lastName}, {employeeCreateWindow.newEmployee.firstName}, {employeeCreateWindow.newEmployee.department.idDep})");
                 UpdateGrid();
             }
         }
@@ -62,7 +62,7 @@ namespace WPF_SQL_Test
             departmentWindow.ShowDialog();
             if (departmentWindow.DialogResult == true)
             {
-                data.AddDepartment(departmentWindow.newDepartment);
+                data.ExecutableQuery($"INSERT INTO departments(dep_name) VALUES({departmentWindow.newDepartment.depName})");
                 departments = data.GetDepartments();
             }
         }
@@ -75,7 +75,7 @@ namespace WPF_SQL_Test
             departmentWindow.ShowDialog();
             if (departmentWindow.DialogResult == true)
             {
-                data.UpdateDepartment(departmentWindow.newDepartment);
+                data.ExecutableQuery($"UPDATE departments SET dep_name = {departmentWindow.newDepartment.depName} WHERE id_dep = {departmentWindow.newDepartment.idDep}");
                 UpdateGrid();
             }
         }
@@ -91,8 +91,8 @@ namespace WPF_SQL_Test
             }
             else if (result == MessageBoxResult.OK)
             {
-                data.DeleteDepartmentFromEmployees(departmentToDelete.idDep);
-                data.DeleteDepartmentById(departmentToDelete.idDep);
+                data.ExecutableQuery($"UPDATE employees SET department_id = {DBNull.Value} WHERE department_id = {departmentToDelete.idDep}");
+                data.ExecutableQuery($"DELETE FROM departments WHERE id_dep = {departmentToDelete.idDep}");
                 UpdateGrid();
             }
         }
@@ -105,22 +105,27 @@ namespace WPF_SQL_Test
             grid.Items.Refresh();
         }
 
+        private void grid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            oldEmployee = new Employee(grid.SelectedItem as Employee);
+        }
+
         private void grid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {
-            if (e.EditAction == DataGridEditAction.Commit && employeeHasChanged)
+            Employee employeeToEdit = e.Row.Item as Employee;
+            if (e.EditAction == DataGridEditAction.Commit && oldEmployee != employeeToEdit)
             {
                 MessageBoxResult result = MessageBox.Show("Вы действительно хотите изменить данные сотрудника?", "Внимание", MessageBoxButton.OKCancel);
                 if (result == MessageBoxResult.Cancel)
                 {
                     e.Cancel = true;
-                    employeeHasChanged = false;
+                    employeeToEdit = oldEmployee; /*тут не работает*/
                 }
                 else if (result == MessageBoxResult.OK)
                 {
-                    Employee employeeToEdit = e.Row.Item as Employee;
-                    data.UpdateEmployee(employeeToEdit);
+                    data.ExecutableQuery($"UPDATE employees SET last_name = {employeeToEdit.lastName}, first_name = {employeeToEdit.firstName}, department_id = {employeeToEdit.department.idDep} WHERE id_emp = {employeeToEdit.idEmp}");
+                    UpdateGrid();
                 }
-                UpdateGrid();
             }
         }
 
@@ -129,12 +134,6 @@ namespace WPF_SQL_Test
             Employee emp = grid.SelectedItem as Employee;
             ComboBox cb = sender as ComboBox;
             emp.department = cb.SelectedItem as Department;
-        }
-
-        private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            employeeHasChanged = true;
-            oldEmployee = grid.SelectedItem as Employee;
         }
     }
 }

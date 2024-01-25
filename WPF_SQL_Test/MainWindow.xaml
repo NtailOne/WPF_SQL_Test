@@ -7,12 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="800" MinWidth="800" MinHeight="600">
     <Grid>
-        <DataGrid Name="grid" ItemsSource="{Binding DataContext.employees}" CanUserAddRows="False" AutoGenerateColumns="False" RowEditEnding="grid_RowEditEnding" Margin="0,0,0,40" >
-            <DataGrid.Resources>
-                <Style TargetType="DataGridRow">
-                    <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
-                </Style>
-            </DataGrid.Resources>
+        <DataGrid Name="grid" ItemsSource="{Binding DataContext.employees}" CanUserAddRows="False" AutoGenerateColumns="False" RowEditEnding="grid_RowEditEnding" Margin="0,0,0,40" BeginningEdit="grid_BeginningEdit" >
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="Фамилия" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
