@@ -13,6 +13,7 @@ namespace WPF_SQL_Test
         public List<Employee> employees { get; set; }
 
         private bool employeeHasChanged = false;
+        private Employee oldEmployee;
 
         public MainWindow()
         {
@@ -123,19 +124,17 @@ namespace WPF_SQL_Test
             }
         }
 
-        private void LastNameBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            employeeHasChanged = true;
-        }
-
-        private void FirstNameBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            employeeHasChanged = true;
-        }
-
         private void DepartmentComboBox_LostFocus(object sender, RoutedEventArgs e)
         {
+            Employee emp = grid.SelectedItem as Employee;
+            ComboBox cb = sender as ComboBox;
+            emp.department = cb.SelectedItem as Department;
+        }
+
+        private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
             employeeHasChanged = true;
+            oldEmployee = grid.SelectedItem as Employee;
         }
     }
 }

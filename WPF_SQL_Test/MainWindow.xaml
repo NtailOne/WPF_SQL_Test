@@ -7,7 +7,12 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="800" MinWidth="800" MinHeight="600">
     <Grid>
-        <DataGrid Name="grid" ItemsSource="{Binding employees}" Margin="0,0,0,38" CanUserAddRows="False" AutoGenerateColumns="False" RowEditEnding="grid_RowEditEnding" >
+        <DataGrid Name="grid" ItemsSource="{Binding DataContext.employees}" CanUserAddRows="False" AutoGenerateColumns="False" RowEditEnding="grid_RowEditEnding" Margin="0,0,0,40" >
+            <DataGrid.Resources>
+                <Style TargetType="DataGridRow">
+                    <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
+                </Style>
+            </DataGrid.Resources>
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="Фамилия" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
@@ -17,7 +22,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding lastName, UpdateSourceTrigger=LostFocus}" LostFocus="LastNameBox_LostFocus" />
+                            <TextBox Text="{Binding lastName, UpdateSourceTrigger=LostFocus}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
@@ -30,7 +35,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                     <DataGridTemplateColumn.CellEditingTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding firstName, UpdateSourceTrigger=LostFocus}" LostFocus="FirstNameBox_LostFocus" />
+                            <TextBox Text="{Binding firstName, UpdateSourceTrigger=LostFocus}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellEditingTemplate>
                 </DataGridTemplateColumn>
